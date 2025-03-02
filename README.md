@@ -7,6 +7,7 @@ Additionally, damage falloff can be configured for long-range attacks based on d
 
 
 {
+
     "mobId": "Entity registry ID (e.g. 'minecraft:pig', 'twilightforest:kobold')",
     
     "protectionDistance": "Minimum distance (in blocks) required to trigger ranged damage protection mechanics",
