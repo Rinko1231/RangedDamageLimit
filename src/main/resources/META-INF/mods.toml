@@ -1,0 +1,17 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="GPL-v3"
+
+[[mods]]
+modId="rangeddamagelimit"
+version="1.20.1-1.0.0"
+displayName="Ranged Damage Limit"
+authors="Rinko1231"
+description='''
+Through the configuration file,
+you can enable ranged damage protection for specific mobs,
+which either caps the damage received at a specific value
+or completely nullifies attacks
+when they occur beyond a set distance.
+Additionally, damage falloff can be configured for long-range attacks based on distance.
+'''
