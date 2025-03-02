@@ -43,7 +43,7 @@ public class ModConfigManager2 {
         List<FalloffRule> defaultRule0 = new ArrayList<>();
 
         FalloffRule exampleRule0 = new FalloffRule();
-        exampleRule0.setFalloff(0.05);
+        exampleRule0.setFalloff(0.01);
 
         defaultRule0.add(exampleRule0);
 
