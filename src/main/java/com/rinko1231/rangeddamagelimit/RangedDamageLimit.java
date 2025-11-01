@@ -32,7 +32,24 @@ public class RangedDamageLimit {
     }
 
     private double calculateRange(DamageSource damagesource, Entity entity) {
-        return damagesource.getEntity() != null ? entity.distanceToSqr(damagesource.getEntity()) : (double) -1.0F;
+        Entity direct = damagesource.getDirectEntity();
+        Entity owner = damagesource.getEntity();
+
+        if (direct != null && owner != null) {
+            double directDistance = entity.distanceToSqr(direct);
+            double ownerDistance = entity.distanceToSqr(owner);
+            return Math.min(directDistance, ownerDistance);
+        }
+
+        if (direct != null) {
+            return entity.distanceToSqr(direct);
+        }
+
+        if (owner != null) {
+            return entity.distanceToSqr(owner);
+        }
+
+        return (double) -1.0F;
     }
 
     // 注册配置重载事件
@@ -50,7 +67,7 @@ public class RangedDamageLimit {
             double range = calculateRange(source, event.getEntity());
 
             Optional<FalloffRule> rule0 = ModConfigManager2.getRule0();
-            if (rule0.isPresent()) {
+            if (rule0.isPresent() && range >= 0) {
                 FalloffRule r0 = rule0.get();
                 double decay = r0.getFalloff();
                 float originalAmount = event.getAmount();
