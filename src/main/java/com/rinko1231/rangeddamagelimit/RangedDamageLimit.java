@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -32,9 +33,49 @@ public class RangedDamageLimit {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
+    //test event: show me the distance
+    /*
+    @SubscribeEvent
+    public void onLivingHurt(LivingHurtEvent event) {
+        //test event
+        DamageSource source = event.getSource();
+        Entity target = event.getEntity();
+        Entity attacker = source.getEntity();
+        Entity direct = source.getDirectEntity();
+
+
+        if (attacker instanceof Player player) {
+            double rangeCalc = -1.0;
+            double directRange = -1.0;
+            double playerRange = -1.0;
+
+            if (attacker.level() == target.level() && attacker.isAddedToWorld()) {
+                rangeCalc = calculateRange(source,target);
+            }
+
+            if (direct != null && direct.level() == target.level() && direct.isAddedToWorld()) {
+                directRange = target.distanceToSqr(direct);
+            }
+
+            if (player.level() == target.level() && player.isAddedToWorld()) {
+                playerRange = target.distanceToSqr(player);
+            }
+
+            String msg = String.format(
+                    "§e[RDL Debug]§r rangeCalc=%.2f | direct→target=%.2f | player→target=%.2f",
+                    rangeCalc, directRange, playerRange
+            );
+
+            player.displayClientMessage(Component.literal(msg), false);
+        }
+    }*/
+
+
     private double calculateRange(DamageSource damagesource, Entity target) {
         Entity direct = damagesource.getDirectEntity();
         Entity owner = damagesource.getEntity();
+        if (owner instanceof FakePlayer faker)
+            owner = direct;//I'm lazy
 
         // 有主的远程投射物
         if (direct != null && ownerOfProjectile(direct) != null) {
@@ -65,12 +106,11 @@ public class RangedDamageLimit {
         return -1.0;
     }
 
-    public Entity ownerOfProjectile(Entity entity)
-    {
+    public Entity ownerOfProjectile(Entity entity) {
         Entity owner = null;
-        if(entity instanceof Projectile projectile) owner = projectile.getOwner();
-        if(entity instanceof ThrownPotion thrownPotion) owner = thrownPotion.getOwner();
-        if(entity instanceof AreaEffectCloud areaEffectCloud) owner = areaEffectCloud.getOwner();
+        if (entity instanceof Projectile projectile) owner = projectile.getOwner();
+        if (entity instanceof ThrownPotion thrownPotion) owner = thrownPotion.getOwner();
+        if (entity instanceof AreaEffectCloud areaEffectCloud) owner = areaEffectCloud.getOwner();
         return owner;
     }
 
@@ -91,7 +131,7 @@ public class RangedDamageLimit {
 
         //检查黑名单
         Entity SourceOwner = event.getSource().getEntity();
-        if (SourceOwner!=null && ModConfigManager3.isEntityBlacklisted(ForgeRegistries.ENTITY_TYPES.getKey(SourceOwner.getType()).toString())) {
+        if (SourceOwner != null && ModConfigManager3.isEntityBlacklisted(ForgeRegistries.ENTITY_TYPES.getKey(SourceOwner.getType()).toString())) {
             return;
         }
 
@@ -126,7 +166,7 @@ public class RangedDamageLimit {
         String mobId = ForgeRegistries.ENTITY_TYPES.getKey(target.getType()).toString();
 
         Entity SourceOwner = event.getSource().getEntity();
-        if (SourceOwner!=null && ModConfigManager3.isEntityBlacklisted(ForgeRegistries.ENTITY_TYPES.getKey(SourceOwner.getType()).toString())) {
+        if (SourceOwner != null && ModConfigManager3.isEntityBlacklisted(ForgeRegistries.ENTITY_TYPES.getKey(SourceOwner.getType()).toString())) {
             return;
         }
 
