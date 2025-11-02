@@ -36,30 +36,35 @@ public class RangedDamageLimit {
         Entity direct = damagesource.getDirectEntity();
         Entity owner = damagesource.getEntity();
 
-        // 如果是远程投射物，使用[发射者]或[伤害源拥有者]距离目标的较小值
-        // 否则使用伤害源拥有者距离目标
-        if (direct != null && ownerOfProjectile(direct)!=null) {
+        // 有主的远程投射物
+        if (direct != null && ownerOfProjectile(direct) != null) {
             Entity owner1 = ownerOfProjectile(direct);
             Entity owner2 = owner;
 
-            //如果不为空，则取距离，如果为空，则取一个极大值确保在取较小值时被舍弃
-            double distance1 = owner1 != null ? target.distanceToSqr(owner1) : Double.MAX_VALUE;
-            double distance2 = owner2 != null ? target.distanceToSqr(owner2) : Double.MAX_VALUE;
+            double distance1 = -1.0;
+            double distance2 = -1.0;
 
-            double minDistance = Math.min(distance1, distance2);
-            if (minDistance == Double.MAX_VALUE) {//取值失败，都是极大
-                return -1.0;
-            } else {
-                return minDistance;
+            //仅当实体在同一个 Level或已加入世界
+            if (owner1 != null && owner1.level() == target.level() && owner1.isAddedToWorld()) {
+                distance1 = target.distanceToSqr(owner1);
             }
+            if (owner2 != null && owner2.level() == target.level() && owner2.isAddedToWorld()) {
+                distance2 = target.distanceToSqr(owner2);
+            }
+
+            if (distance1 < 0 && distance2 < 0) return -1.0; // 都不可用
+            if (distance1 < 0) return distance2;
+            if (distance2 < 0) return distance1;
+            return Math.min(distance1, distance2);
         }
 
-        if (owner != null) {
+        if (owner != null && owner.level() == target.level() && owner.isAddedToWorld()) {
             return target.distanceToSqr(owner);
         }
 
         return -1.0;
     }
+
     public Entity ownerOfProjectile(Entity entity)
     {
         Entity owner = null;
@@ -68,6 +73,7 @@ public class RangedDamageLimit {
         if(entity instanceof AreaEffectCloud areaEffectCloud) owner = areaEffectCloud.getOwner();
         return owner;
     }
+
 
     // 注册配置重载事件
     @SubscribeEvent
